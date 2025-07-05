@@ -1,9 +1,10 @@
 import serial
 import time
 from datetime import datetime
+import os
 
-PORT = '/dev/ttyUSB0'  # Change if needed
-ADDRESS = 0xDA5A        # Coolant temperature memory address
+PORT = '/dev/ttyUSB0'
+ADDRESS = 0xDA5A
 
 def build_request(address):
     hi = (address >> 8) & 0xFF
@@ -18,12 +19,22 @@ def parse_response(response):
     raw = response[5]
     return raw * 0.747 - 48
 
+def wait_for_serial(port):
+    print(f"Waiting for {port} to become available...")
+    while True:
+        if os.path.exists(port):
+            try:
+                ser = serial.Serial(port, baudrate=9600, bytesize=8,
+                                    parity=serial.PARITY_EVEN, stopbits=1,
+                                    timeout=1)
+                print("Connected to MS41 ECU via K-Line")
+                return ser
+            except serial.SerialException:
+                pass  # exists but not ready yet
+        time.sleep(2)
+
 def main():
-    ser = serial.Serial(PORT, baudrate=9600, bytesize=8,
-                        parity=serial.PARITY_EVEN, stopbits=1,
-                        timeout=1)
-    time.sleep(1)
-    print("Connected to MS41 ECU via K-Line")
+    ser = wait_for_serial(PORT)
 
     try:
         while True:
