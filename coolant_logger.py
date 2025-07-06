@@ -2,6 +2,10 @@ import serial
 import time
 from datetime import datetime
 import os
+import board
+import busio
+import adafruit_ssd1306
+from PIL import Image, ImageDraw, ImageFont
 
 PORT = '/dev/ttyUSB0'
 ADDRESS = 0xDA5A
@@ -20,7 +24,22 @@ def parse_response(response):
     return raw * 0.747 - 48
 
 def wait_for_serial(port):
-    print(f"Waiting for {port} to become available...")
+    # I2C setup for Pi
+    i2c = busio.I2C(board.SCL, board.SDA)
+    oled = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c)
+
+    # Clear the display
+    oled.fill(0)
+    oled.show()
+
+    # Use PIL to draw on OLED
+    image = Image.new("1", (oled.width, oled.height))
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.load_default()
+
+    draw.text((0, 10), "Waiting for USB device...", font=font, fill=255)
+    oled.image(image)
+    oled.show()
     while True:
         if os.path.exists(port):
             try:
