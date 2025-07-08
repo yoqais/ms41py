@@ -61,24 +61,23 @@ The script will wait for `/dev/ttyUSB0` to appear (K+DCAN cable). Once detected,
 
 You can test everything without hardware using `socat`:
 
-### 1. Create virtual serial ports:
+### 1. Run Bash Script:
 ```bash
-socat -d -d PTY,raw,echo=0 PTY,raw,echo=0
+./start_kline.sh
 ```
 
 You’ll see:
 ```
-PTY is /dev/pts/1
-PTY is /dev/pts/2
+pi@raspberrypi:~/ms41py $ ./start_kline.sh
+socat: no process found
+Terminated previous Socat opps
+Virtual serial ports created:
+  Logger => /tmp/tty.ms41logger
+  Emulator => /tmp/tty.ms41emu
+✅ MS41.2 Emulator running on /tmp/tty.ms41emu
 ```
 
-### 2. Run fake ECU:
-```bash
-python3 fake_ecu.py
-```
-Edit `PORT = "/dev/pts/2"` inside `fake_ecu.py`.
-
-### 3. Run logger:
+### 2. Run logger:
 ```bash
 python3 coolant_logger.py
 ```
