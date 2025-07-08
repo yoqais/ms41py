@@ -1,7 +1,7 @@
 import serial
 import time
 
-PORT = "/dev/pts/2"  # change to your virtual port
+PORT = "/tmp/tty.ms41emu"  # change to your virtual port
 coolant_temp = 85.0
 battery_voltage = 13.5
 
