@@ -45,8 +45,8 @@ def build_group_request(group=0x0B, subgroup=0x01):
     return bytearray(cmd + [xor_checksum(cmd)])
 
 def build_ecu_id_request():
-    cmd = [0x68, 0x6A, 0xF0, 0x58] + ECU_ID_CMD
-    return bytearray(cmd + [xor_checksum(cmd)])
+    return bytearray(ECU_ID_CMD + [xor_checksum(ECU_ID_CMD)])
+
 # ────────────── Response Parsers ──────────────
 def parse_coolant(response):
     if len(response) < 6: return None
@@ -91,7 +91,7 @@ def wait_for_serial(port, oled, font):
                 return ser
             except serial.SerialException:
                 pass
-        time.sleep(1)
+        time.sleep(2)
 
 # ────────────── Main ──────────────
 def main():
@@ -103,12 +103,13 @@ def main():
     ser.write(build_ecu_id_request())
     time.sleep(0.1)
     ecu_id_resp = ser.read(32)
+    print(ecu_id_resp)
     ecu_id = parse_ecu_id(ecu_id_resp)
-
+    print(ecu_id)
     if not ecu_id:
         ecu_id = "default"
     draw_text(oled, "ECU ID:", ecu_id, font)
-    time.sleep(1)
+    time.sleep(2)
 
     voltage_offset = BATTERY_OFFSETS.get(ecu_id, BATTERY_OFFSETS["default"])
     print(voltage_offset)
@@ -144,3 +145,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
